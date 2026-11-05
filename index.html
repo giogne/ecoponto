@@ -1,0 +1,789 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>EcoPonto - Tubarão SC</title>
+
+  <!-- Biblioteca de mapas Leaflet -->
+  <link rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+ 
+
+
+ <style>
+  /* Botão para limpar o filtro */
+#limparFiltro {
+    background-color: #16834e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#limparFiltro:hover {
+    background-color: #0f633a;
+}
+
+#limparFiltro:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 3px;
+}
+    /* Seção educativa */
+.educacao {
+    background-color: #e8f5e9;
+    color: #1b4332;
+    padding: 25px;
+    border-radius: 12px;
+    margin-top: 25px;
+    line-height: 1.6;
+}
+
+/* Título principal */
+.educacao h2 {
+    color: #166534;
+    margin-bottom: 15px;
+}
+
+/* Subtítulo */
+.educacao h3 {
+    color: #15803d;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+/* Lista de orientações */
+.educacao ul {
+    padding-left: 25px;
+}
+
+.educacao li {
+    margin-bottom: 8px;
+}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f8f5;
+    }
+
+    header {
+      background-color: #16834e;
+      color: white;
+      text-align: center;
+      padding: 25px;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    #mapa {
+      height: 500px;
+      width: 100%;
+      border-radius: 12px;
+    }
+
+/* Área do filtro */
+.filtro {
+    background-color: #ffffff;
+    padding: 18px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Texto do filtro */
+.filtro label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #166534;
+}
+
+/* Campo de seleção */
+.filtro select {
+    padding: 12px 15px;
+    border: 2px solid #16a34a;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #222222;
+    font-size: 15px;
+    cursor: pointer;
+    flex: 1;
+    min-width: 180px;
+}
+
+/* Destaque ao selecionar */
+.filtro select:focus {
+    outline: none;
+    border-color: #15803d;
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+}
+
+/* Aparência dos popups do mapa */
+.leaflet-popup-content-wrapper {
+    background-color: #242424;
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 8px;
+}
+
+.leaflet-popup-content {
+    font-size: 14px;
+    line-height: 1.6;
+    min-width: 260px;
+    max-height: 260px;
+overflow-y: auto;
+}
+
+.leaflet-popup-content a {
+    color: #65d99a;
+    font-weight: bold;
+}
+
+.leaflet-popup-tip {
+    background-color: #242424;
+}
+
+.leaflet-popup-close-button {
+    color: #ffffff !important;
+}
+
+/* Aviso quando não houver pontos de coleta */
+#mensagemSemPontos {
+    background-color: #1e3026;
+    color: #d5f5df;
+    border-left: 4px solid #28c76f;
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-top: 15px;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+/* Ajustes dos popups para celulares */
+@media (max-width: 600px) {
+
+    .leaflet-popup-content-wrapper {
+        padding: 4px;
+        border-radius: 10px;
+    }
+
+    .leaflet-popup-content {
+        min-width: 0;
+        width: 220px !important;
+        max-width: calc(100vw - 100px);
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .leaflet-popup {
+        margin-bottom: 18px;
+    }
+
+    .leaflet-popup-close-button {
+        font-size: 20px !important;
+    }
+}
+/* Contador de pontos de coleta */
+#contadorPontos {
+    background-color: #1b3327;
+    color: #7ee2a0;
+    padding: 12px 16px;
+    border-left: 4px solid #16834e;
+    border-radius: 6px;
+    margin-top: 12px;
+    margin-bottom: 16px;
+    font-weight: bold;
+}
+/* Ajustes para celulares */
+@media (max-width: 600px) {
+
+/* Corrigir o campo de pesquisa no celular */
+#pesquisaPonto {
+    width: 100%;
+    height: 44px;
+    min-height: 44px;
+    padding: 10px 12px;
+    box-sizing: border-box;
+}
+    .filtro {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .filtro label {
+        width: 100%;
+    }
+
+    .filtro select {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    #limparFiltro {
+        width: 100%;
+    }
+}
+/* Área da lista de pontos */
+.lista-pontos {
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+.lista-pontos h2 {
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+
+/* Cartões dos pontos de coleta */
+.cartao-ponto {
+    background-color: #26332b;
+    border-left: 4px solid #16a34a;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.cartao-ponto h3 {
+    color: #65d995;
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+
+.cartao-ponto p {
+    color: #e5e7eb;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+/* Botão Ver no mapa */
+.botao-ver-mapa {
+    background-color: #16834e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 18px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-right: 10px;
+    transition: background-color 0.2s;
+}
+
+.botao-ver-mapa:hover {
+    background-color: #16a34a;
+}
+
+.botao-ver-mapa:focus-visible {
+    outline: 3px solid #65d995;
+    outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+    .botao-ver-mapa {
+        width: 100%;
+    }
+}
+/* Campo de pesquisa dos pontos de coleta */
+#pesquisaPonto {
+    flex: 0 0 auto;    min-width: 0;
+    padding: 12px 15px;
+    background-color: #1a1a1a;
+    color: white;
+    border: 2px solid #16a34a;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+#pesquisaPonto::placeholder {
+    color: #aaaaaa;
+}
+
+#pesquisaPonto:focus {
+    outline: none;
+    border-color: #65d995;
+}
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>♻ EcoPonto</h1>
+    <p>Localizador de descarte eletrônico</p>
+  </header>
+
+  <main>
+    <h2>Encontre pontos de descarte</h2>
+
+    <p>
+      Localize pontos de coleta de pilhas,
+      baterias, celulares e eletrônicos
+      em Tubarão e região.
+    </p>
+
+ 
+<div class="filtro">
+
+  <input
+    type="text"
+    id="pesquisaPonto"
+    placeholder="🔎 Pesquisar ponto de coleta..."
+    aria-label="Pesquisar ponto de coleta por nome ou endereço"
+>
+  <label for="tipoMaterial">
+    O que você deseja descartar?
+  </label>
+
+  <select id="tipoMaterial">
+    <option value="todos">Todos os materiais</option>
+    <option value="pilhas">Pilhas e baterias</option>
+    <option value="celulares">Celulares</option>
+    <option value="eletronicos">Computadores e eletrônicos</option>
+</select>
+
+<button id="limparFiltro" type="button">
+    Limpar filtro
+</button>
+</div>
+
+    <div id="mapa"></div>
+
+<p id="contadorPontos">5 pontos de coleta encontrados.</p>
+
+<p id="mensagemSemPontos" style="display: none;">
+    🔎 Nenhum ponto de coleta encontrado.
+    Verifique o nome pesquisado ou selecione outro tipo de material.
+</p>
+
+<section class="lista-pontos">
+    <h2>Locais de descarte disponíveis</h2>
+
+    <div id="listaPontos"></div>
+</section>    
+<section class="educacao">
+  <h2>Por que descartar eletrônicos corretamente?</h2>
+
+  <p>
+    O descarte inadequado de equipamentos eletrônicos pode
+    contaminar o solo e a água, além de desperdiçar materiais
+    que poderiam ser reciclados.
+  </p>
+
+  <h3>Como você pode ajudar?</h3>
+
+  <ul>
+    <li>Não descarte pilhas e baterias no lixo comum.</li>
+    <li>Procure pontos de coleta adequados para eletrônicos.</li>
+    <li>Considere consertar ou doar equipamentos em bom estado.</li>
+    <li>Apague seus dados pessoais antes de entregar celulares e computadores.</li>
+  </ul>
+</section>
+
+  </main>
+
+  <!-- Carrega o JavaScript do Leaflet -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+  </script>
+
+  <script>
+    // Criar o mapa centralizado em Tubarão
+    const mapa = L.map('mapa').setView(
+      [-28.4713, -49.0144],
+      13
+    );
+
+    // Adicionar o mapa do OpenStreetMap
+    L.tileLayer(
+      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      {
+        attribution:
+          '&copy; OpenStreetMap contributors',
+        maxZoom: 19
+      }
+    ).addTo(mapa);
+
+
+
+    // Lista de pontos de coleta
+
+const pontosColeta = [
+  {
+    nome: "FUNAT - Fundação Municipal de Meio Ambiente",
+    endereco: "Rua Antônio Borges, s/n - Oficinas, Tubarão - SC",
+    materiais: "Resíduos eletrônicos - confirme os itens aceitos",
+    categoria: "eletronicos",
+latitude: -28.4919707878672,
+longitude: -49.02597871845259,
+
+
+    demonstracao: false
+},
+{
+        nome: "ReciclaACIT - Edifício Minas Center",
+        endereco: "Edifício Minas Center - Tubarão - SC",
+        materiais: "Eletroeletrônicos pequenos que caibam nas caixas",
+        observacao: "Coletores no térreo, ao final do corredor principal, e no segundo andar, na saída do elevador.",
+        
+horario: "Segunda a sexta-feira, das 09h às 12h e das 13h30 às 18h. Sem acesso público nos fins de semana.",
+
+        categoria: "eletronicos",
+        latitude: -28.47913834284159,
+        longitude: -49.000024603144126,
+        demonstracao: false
+    },
+    {
+    nome: "Loja Vivo - Centro",
+    endereco: "Rua Lauro Müller, 25 - Centro, Tubarão - SC",
+    materiais: "Pilhas, baterias, carregadores e aparelhos celulares",
+    horario: "Segunda a sexta-feira, das 09h às 18h. Sábado, das 09h às 12h. Domingo fechado.",
+    categoria: "celulares",
+    categorias: ["pilhas", "celulares"],
+    latitude: -28.481159359760643,
+    longitude: -49.00788670000001,
+    demonstracao: false
+},
+{
+    nome: "Loja Vivo - Farol Shopping",
+    endereco: "Av. Marcolino Martins Cabral, 2525 - Aeroporto, Tubarão - SC",
+    materiais: "Pilhas, baterias, carregadores e aparelhos celulares",
+    horario: "Segunda a sábado, das 10h às 22h. Domingo, das 14h às 21h.",
+    categoria: "celulares",
+    categorias: ["pilhas", "celulares"],
+    latitude: -28.47501079312594,
+    longitude: -48.99583193542605,
+    demonstracao: false
+},
+{
+    nome: "Loja Samsung - Farol Shopping",
+    endereco: "Av. Marcolino Martins Cabral, 2525 - 1º piso, Loja 10 - Tubarão - SC",
+    materiais: "Pilhas, baterias e aparelhos celulares",
+    horario: "Segunda a sábado, das 10h às 22h. Domingo, das 14h às 21h.",
+    categoria: "celulares",
+    categorias: ["pilhas", "celulares"],
+    latitude: -28.47532236456548,
+    longitude: -48.99508006834577,
+    demonstracao: false
+},
+{
+    nome: "Loja Claro - Centro",
+    endereco: "Av. Marcolino Martins Cabral, 756 - Centro, Tubarão - SC",
+    materiais: "Pilhas, baterias, celulares, carregadores, tablets, notebooks e outros eletrônicos",
+    horario: "Segunda a sexta-feira, das 09h às 18h. Sábado, das 09h às 13h. Domingo fechado.",
+    categoria: "eletronicos",
+    categorias: ["pilhas", "celulares", "eletronicos"],
+    latitude: -28.482550079044927,
+    longitude: -49.00815184262451,
+    demonstracao: false
+},
+{
+    nome: "Loja Claro - Farol Shopping",
+    endereco: "Av. Marcolino Martins Cabral, 2525 - Aeroporto, Tubarão - SC, Loja SI97",
+    materiais: "Pilhas, baterias, celulares, carregadores, tablets, notebooks e outros eletrônicos",
+    horario: "Segunda a sábado, das 10h às 22h. Domingo, das 14h às 21h.",
+    categoria: "eletronicos",
+    categorias: ["pilhas", "celulares", "eletronicos"],
+    latitude: -28.473711684405803,
+    longitude: -48.99545278191307,
+    demonstracao: false
+},
+{
+    nome: "Loja TIM - Centro",
+    endereco: "Av. Marcolino Martins Cabral, 1000 - Centro, Tubarão - SC",
+    materiais: "Pilhas, baterias, carregadores, celulares e eletrônicos",
+    horario: "Segunda a sexta-feira, das 09h às 18h. Sábado, das 09h às 13h. Domingo fechado.",
+    categoria: "eletronicos",
+    categorias: ["pilhas", "celulares", "eletronicos"],
+    latitude: -28.482725755754252,
+    longitude: -49.00831263267328,
+    demonstracao: false
+},
+{
+    nome: "Loja TIM - Farol Shopping",
+    endereco: "Av. Marcolino Martins Cabral, 2525 - Aeroporto, Tubarão - SC, Loja SUC 55",
+    materiais: "Pilhas, baterias, carregadores, celulares e eletrônicos",
+    horario: "Segunda a sábado, das 10h às 22h. Domingo, das 14h às 21h.",
+    categoria: "eletronicos",
+    categorias: ["pilhas", "celulares", "eletronicos"],
+    latitude: -28.474362514928174,
+    longitude: -48.99463093029313,
+    demonstracao: false
+}
+];
+
+
+// Guardar os marcadores para utilizar no filtro
+const marcadores = [];
+
+// Criar os cartões dos pontos de coleta
+function mostrarPontosNaLista(pontos) {
+    const lista = document.getElementById("listaPontos");
+
+    lista.innerHTML = "";
+
+    pontos.forEach(function(ponto) {
+        const cartao = document.createElement("div");
+        cartao.className = "cartao-ponto";
+
+        const titulo = document.createElement("h3");
+        titulo.textContent = ponto.nome;
+
+        const endereco = document.createElement("p");
+        endereco.textContent = "Endereço: " + ponto.endereco;
+
+        const materiais = document.createElement("p");
+        materiais.textContent = "Materiais: " + ponto.materiais;
+
+        cartao.appendChild(titulo);
+        cartao.appendChild(endereco);
+        cartao.appendChild(materiais);
+        if (ponto.observacao) {
+    const observacao = document.createElement("p");
+    observacao.textContent = "📍 Onde entregar: " + ponto.observacao;
+    cartao.appendChild(observacao);
+}
+
+if (ponto.horario) {
+    const horario = document.createElement("p");
+    horario.textContent = "🕒 Horário de entrega: " + ponto.horario;
+    cartao.appendChild(horario);
+}
+        
+        const botaoMapa = document.createElement("button");
+botaoMapa.textContent = "📍 Ver no mapa";
+botaoMapa.className = "botao-ver-mapa";
+botaoMapa.addEventListener("click", function() {
+    mapa.setView([ponto.latitude, ponto.longitude], 16);
+
+    const itemEncontrado = marcadores.find(function(item) {
+        const coordenadas = item.marcador.getLatLng();
+
+        return coordenadas.lat === ponto.latitude &&
+               coordenadas.lng === ponto.longitude;
+    });
+
+    if (itemEncontrado) {
+        itemEncontrado.marcador.openPopup();
+    }
+
+    document.getElementById("mapa").scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
+});
+cartao.appendChild(botaoMapa);
+const botaoRota = document.createElement("button");
+
+botaoRota.textContent = "🧭 Como chegar";
+botaoRota.className = "botao-ver-mapa";
+
+botaoRota.addEventListener("click", function() {
+    const destino = encodeURIComponent(ponto.endereco);
+
+    window.open(
+        `https://www.google.com/maps/dir/?api=1&destination=${destino}`,
+        "_blank"
+    );
+});
+
+cartao.appendChild(botaoRota);
+
+        lista.appendChild(cartao);
+    });
+}
+
+// Pesquisar pontos pelo nome ou endereço
+function pesquisarPontos() {
+    const pesquisa = document.getElementById("pesquisaPonto")
+        .value.toLowerCase().trim();
+
+    const tipo = document.getElementById("tipoMaterial").value;
+
+    const pontosFiltrados = pontosColeta.filter(function(ponto) {
+const normalizarTexto = function(texto) {
+    return texto
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+};
+
+const palavrasPesquisadas = normalizarTexto(pesquisa).split(" ");
+
+const textoPonto = normalizarTexto(
+    ponto.nome + " " + ponto.endereco
+);
+
+const correspondePesquisa = palavrasPesquisadas.every(function(palavra) {
+    return textoPonto.includes(palavra);
+});
+
+        const correspondeTipo =
+    tipo === "todos" ||
+    ponto.categoria === tipo ||
+    (ponto.categorias && ponto.categorias.includes(tipo));
+        return correspondePesquisa && correspondeTipo;
+    });
+
+    mostrarPontosNaLista(pontosFiltrados);
+    // Atualizar a quantidade de pontos encontrados
+const contador = document.getElementById("contadorPontos");
+const quantidade = pontosFiltrados.length;
+
+contador.textContent = quantidade === 1
+    ? "1 ponto de coleta encontrado."
+    : quantidade + " pontos de coleta encontrados.";
+    // Mostrar ou ocultar a mensagem de nenhum resultado
+const mensagemSemPontos = document.getElementById("mensagemSemPontos");
+
+if (quantidade === 0) {
+    mensagemSemPontos.style.display = "block";
+} else {
+    mensagemSemPontos.style.display = "none";
+}
+    // Atualizar os marcadores do mapa conforme a pesquisa
+marcadores.forEach(function(item) {
+    mapa.removeLayer(item.marcador);
+
+    const coordenadas = item.marcador.getLatLng();
+
+    const encontrado = pontosFiltrados.some(function(ponto) {
+        return ponto.latitude === coordenadas.lat &&
+               ponto.longitude === coordenadas.lng;
+    });
+
+    if (encontrado) {
+        item.marcador.addTo(mapa);
+    }
+});
+// Centralizar o mapa nos pontos encontrados
+if (pontosFiltrados.length === 1) {
+    mapa.setView(
+        [pontosFiltrados[0].latitude, pontosFiltrados[0].longitude],
+        16
+    );
+} else if (pontosFiltrados.length > 1) {
+    const limitesFiltrados = L.latLngBounds(
+        pontosFiltrados.map(function(ponto) {
+            return [ponto.latitude, ponto.longitude];
+        })
+    );
+
+    mapa.fitBounds(limitesFiltrados, {
+        padding: [50, 50],
+        maxZoom: 15
+    });
+}
+}
+
+// Exibir os pontos cadastrados na lista
+pesquisarPontos();
+// Atualizar a pesquisa enquanto o usuário digita
+document.getElementById("pesquisaPonto").addEventListener("input", pesquisarPontos);
+// Atualizar a pesquisa ao selecionar um tipo de material
+document.getElementById("tipoMaterial").addEventListener("change", pesquisarPontos);
+    // Criar um marcador para cada ponto
+    pontosColeta.forEach(function(ponto) {
+
+      const destino = encodeURIComponent(
+        ponto.endereco
+      );
+
+      const marcador = L.marker([
+        ponto.latitude,
+        ponto.longitude
+      ]).addTo(mapa);
+
+      let mensagem = `
+        <b>${ponto.nome}</b><br>
+        ${ponto.endereco}<br>
+        ${ponto.materiais}<br><br>
+      `;
+
+      if (ponto.demonstracao) {
+        mensagem += "<b>APENAS DEMONSTRAÇÃO</b>";
+      } else {
+        mensagem += `
+          
+${ponto.nome.includes("ReciclaACIT") ? "" : ""}
+
+${ponto.horario ? "" : "Confirme o atendimento antes de visitar.<br><br>"}
+
+          <a
+            href="https://www.google.com/maps/dir/?api=1&destination=${destino}"
+            target="_blank"
+            rel="noopener noreferrer">
+            Como chegar
+          </a>
+        `;
+      }
+
+ 
+if (ponto.observacao) {
+    mensagem += `<br><br><b>Onde entregar:</b><br>${ponto.observacao}`;
+}
+
+if (ponto.horario) {
+    mensagem += `<br><br><b>Horário de entrega:</b><br>${ponto.horario}`;
+}
+
+marcador.bindPopup(mensagem, {
+    maxWidth: 280,
+    maxHeight: 250,
+    autoPan: true,
+    keepInView: true
+});      // Guardar o marcador e sua categoria
+marcadores.push({
+  marcador: marcador,
+  categoria: ponto.categoria
+});
+    });
+
+    // Ajustar o mapa para mostrar todos os pontos de coleta
+    const limites = L.latLngBounds(
+        pontosColeta.map(function(ponto) {
+            return [ponto.latitude, ponto.longitude];
+        })
+    );
+
+    mapa.fitBounds(limites, {
+        padding: [50, 50],
+        maxZoom: 14
+    });
+
+    // Identificar o seletor de materiais
+    const filtroMaterial = document.getElementById("tipoMaterial");
+    const botaoLimpar = document.getElementById("limparFiltro");
+
+botaoLimpar.addEventListener("click", function() {
+    document.getElementById("pesquisaPonto").value = "";
+    filtroMaterial.value = "todos";
+    pesquisarPontos();
+});
+
+    // Executar quando o visitante escolher um material
+
+
+  </script>
+</body>
+</html>
