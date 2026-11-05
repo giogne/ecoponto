@@ -17,6 +17,15 @@
 
 
  <style>
+  /* Tema claro oficial do EcoPonto */
+:root {
+    color-scheme: light;
+}
+
+html, body {
+    background-color: #f1f7f1;
+    color: #172b20;
+}
   /* Botão para limpar o filtro */
 #limparFiltro {
     background-color: #16834e;
@@ -321,6 +330,40 @@ overflow-y: auto;
     outline: none;
     border-color: #65d995;
 }
+/* Título dos locais de descarte no tema claro */
+.lista-pontos h2 {
+    color: #14532d;
+}
+/* Quadro de apresentação do EcoPonto */
+.apresentacao {
+    background-color: #e5f5e9;
+    border: 2px solid #16834e;
+    border-radius: 14px;
+    padding: 22px 26px;
+    margin-bottom: 18px;
+}
+
+.apresentacao h2 {
+    color: #14532d;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.apresentacao p {
+    color: #234b35;
+    margin: 0;
+    line-height: 1.6;
+}
+/* Destaque do título dos locais de descarte */
+.lista-pontos h2 {
+    background-color: #e5f5e9;
+    color: #14532d;
+    border-left: 5px solid #16834e;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 20px;
+    margin-bottom: 16px;
+}
   </style>
 </head>
 
@@ -332,6 +375,7 @@ overflow-y: auto;
   </header>
 
   <main>
+    <div class="apresentacao">
     <h2>Encontre pontos de descarte</h2>
 
     <p>
@@ -339,6 +383,7 @@ overflow-y: auto;
       baterias, celulares e eletrônicos
       em Tubarão e região.
     </p>
+    </div>
 
  
 <div class="filtro">
